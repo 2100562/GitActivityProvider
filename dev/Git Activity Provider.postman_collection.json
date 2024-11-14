@@ -96,6 +96,88 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Deploy Activity",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activityID\": \"This text is an activity instance identifier in Inven!RA\",\n    \"Inven!RAstdID\": \"This text is a user identifier in Inven!RA\",\n    \"json_params\": {\n        \"s1\" : \"Configuration Parameter 1\",\n        \"s2\" : \"Configuration Parameter 2\",\n        \"s3\" : \"Configuration Parameter 3\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/activity/deploy",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"activity",
+						"deploy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Activity",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/activity?id=1234",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"activity"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1234"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Individual Activity Config",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"studentId\": \"123\",\n    \"activityId\": \"1234\",\n    \"gitRepositoryUrl\": \"https://github.com/2100562/GitActivityProvider\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/activity",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"activity"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
