@@ -43,7 +43,7 @@ public final class ConfigurationController implements HttpService {
 
   /**
    * The Configuration Parameters Handler which handles requests to
-   * /api/configuration/parameters.
+   * /configuration/parameters.
    *
    * @author Hugo Gonçalves
    * @since 0.0.1
@@ -64,21 +64,11 @@ public final class ConfigurationController implements HttpService {
           .header("Content-Type", Constants.CONTENT_TYPE_JSON)
           .send(configurationService.getConfigurationParameters());
     }
-
-    @Override
-    public void beforeStart() {
-      Handler.super.beforeStart();
-    }
-
-    @Override
-    public void afterStop() {
-      Handler.super.afterStop();
-    }
   }
 
   /**
    * The Configuration Interface Handler which handles requests to
-   * /api/configuration/interface.
+   * /configuration/interface.
    *
    * @author Hugo Gonçalves
    * @since 0.0.1
@@ -98,16 +88,6 @@ public final class ConfigurationController implements HttpService {
           .status(200)
           .header("Content-Type", Constants.CONTENT_TYPE_HTML)
           .send(configurationService.getConfigurationInterface());
-    }
-
-    @Override
-    public void beforeStart() {
-      Handler.super.beforeStart();
-    }
-
-    @Override
-    public void afterStop() {
-      Handler.super.afterStop();
     }
   }
 }

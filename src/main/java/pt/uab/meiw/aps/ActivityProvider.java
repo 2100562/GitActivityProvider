@@ -8,6 +8,8 @@ import io.helidon.webserver.accesslog.AccessLogFeature;
 import io.helidon.webserver.http.HttpRouting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pt.uab.meiw.aps.analytics.AnalyticsController;
+import pt.uab.meiw.aps.analytics.impl.AnalyticsServiceImpl;
 import pt.uab.meiw.aps.configuration.ConfigurationController;
 import pt.uab.meiw.aps.configuration.impl.ConfigurationServiceImpl;
 
@@ -35,6 +37,9 @@ public final class ActivityProvider {
     final var configService = new ConfigurationServiceImpl(om, config);
     final var configController = new ConfigurationController(configService);
 
+    final var analyticsService = new AnalyticsServiceImpl(om, config);
+    final var analyticsController = new AnalyticsController(analyticsService);
+
     // For part 1 we're only providing the basic REST APIs
     LOG.info("Building and starting Webserver");
 
@@ -53,6 +58,7 @@ public final class ActivityProvider {
             HttpRouting
                 .builder()
                 .register("/configuration", configController)
+                .register("/analytics", analyticsController)
         )
         .config(config.get("server"))
         .build()

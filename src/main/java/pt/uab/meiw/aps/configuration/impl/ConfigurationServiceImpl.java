@@ -36,13 +36,15 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     final var configParPath = config
         .get("ap")
-        .get("config-parameters-path")
+        .get("configuration")
+        .get("parameters-path")
         .asString()
         .orElse("");
 
     final var configHtmlPath = config
         .get("ap")
-        .get("config-interface-path")
+        .get("configuration")
+        .get("interface-path")
         .asString()
         .orElse("");
 

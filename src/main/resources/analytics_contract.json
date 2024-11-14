@@ -1,0 +1,26 @@
+{
+  "qualAnalytics": [
+    {
+      "name": "repo_created_at",
+      "type": "text/plain"
+    },
+    {
+      "name": "repo_file_names",
+      "type": "text/csv"
+    }
+  ],
+  "quantAnalytics": [
+    {
+      "name": "commit_count",
+      "type": "integer"
+    },
+    {
+      "name": "avg_duration_between_commits_ms",
+      "type": "long"
+    },
+    {
+      "name": "repo_file_count",
+      "type": "integer"
+    }
+  ]
+}
