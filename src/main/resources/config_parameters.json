@@ -1,0 +1,10 @@
+[
+  {
+    "name": "name",
+    "type": "text/plain"
+  },
+  {
+    "name": "instructions",
+    "type": "text/plain"
+  }
+]
