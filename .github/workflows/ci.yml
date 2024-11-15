@@ -6,6 +6,7 @@ on:
 
 jobs:
   test:
+    name: Build and test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -21,7 +22,7 @@ jobs:
         run: mvn clean package
 
   push_to_registry:
-    name: Push Docker image to Docker Hub
+    name: Build and Push Docker image to ghcr
     runs-on: ubuntu-latest
     permissions:
       packages: write
