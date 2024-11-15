@@ -25,6 +25,7 @@
 
     <!-- Plugins -->
     <version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
+    <version.maven-dependency-plugin>3.8.1</version.maven-dependency-plugin>
   </properties>
 
   <!-- Helidon BOM, Helidon is the Web Framework used to implement all REST APIs -->
@@ -145,6 +146,24 @@
           <target>21</target>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>${version.maven-dependency-plugin}</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 </project>
