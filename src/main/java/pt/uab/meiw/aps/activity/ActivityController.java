@@ -5,6 +5,9 @@ import io.helidon.webserver.http.HttpRules;
 import io.helidon.webserver.http.HttpService;
 import io.helidon.webserver.http.ServerRequest;
 import io.helidon.webserver.http.ServerResponse;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pt.uab.meiw.aps.Constants;
@@ -50,7 +53,7 @@ public final class ActivityController implements HttpService {
 
     @Override
     public void handle(ServerRequest req, ServerResponse res) throws Exception {
-      DeployRequest request;
+      DeployRequest request = null;
       int status;
 
       try {
@@ -61,8 +64,25 @@ public final class ActivityController implements HttpService {
         status = 400;
       }
 
+      // Find redirect URL
+      final var orig = req.requestedUri().toUri();
+      String url = "";
+
+      if (request != null) {
+        final var id =
+            "id=" + URLEncoder.encode(request.getActivityId(),
+                StandardCharsets.UTF_8);
+        url = new URI(
+            orig.getScheme(),
+            orig.getAuthority(),
+            "/activity",
+            id,
+            null
+        ).toURL().toString();
+      }
+
       // MVP takes no actions, only acks the request.
-      res.status(status).send();
+      res.status(status).send(url);
     }
   }
 
