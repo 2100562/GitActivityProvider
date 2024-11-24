@@ -2,10 +2,10 @@ package pt.uab.meiw.aps.configuration;
 
 import io.helidon.webserver.http.Handler;
 import io.helidon.webserver.http.HttpRules;
-import io.helidon.webserver.http.HttpService;
 import io.helidon.webserver.http.ServerRequest;
 import io.helidon.webserver.http.ServerResponse;
 import pt.uab.meiw.aps.Constants;
+import pt.uab.meiw.aps.Controller;
 
 /**
  * The Configuration Controller is responsible for configuring the Helidon
@@ -15,7 +15,7 @@ import pt.uab.meiw.aps.Constants;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public final class ConfigurationController implements HttpService {
+public final class ConfigurationController implements Controller {
 
   private final ConfigurationService configurationService;
 

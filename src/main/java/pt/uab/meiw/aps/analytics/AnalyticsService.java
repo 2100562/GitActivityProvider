@@ -1,5 +1,7 @@
 package pt.uab.meiw.aps.analytics;
 
+import pt.uab.meiw.aps.Service;
+
 /**
  * The Analytics Service must provide two methods, one that returns the
  * Analytics Contract and another that returns the Analytics collected as
@@ -9,7 +11,7 @@ package pt.uab.meiw.aps.analytics;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public interface AnalyticsService {
+public interface AnalyticsService extends Service {
 
   /**
    * Returns the Analytics Contract for this AP.

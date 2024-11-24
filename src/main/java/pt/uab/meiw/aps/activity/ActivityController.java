@@ -2,7 +2,6 @@ package pt.uab.meiw.aps.activity;
 
 import io.helidon.webserver.http.Handler;
 import io.helidon.webserver.http.HttpRules;
-import io.helidon.webserver.http.HttpService;
 import io.helidon.webserver.http.ServerRequest;
 import io.helidon.webserver.http.ServerResponse;
 import java.net.URI;
@@ -11,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pt.uab.meiw.aps.Constants;
+import pt.uab.meiw.aps.Controller;
 
 /**
  * The Activity Controller is responsible for configuring the Helidon Webserver
@@ -21,7 +21,7 @@ import pt.uab.meiw.aps.Constants;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public final class ActivityController implements HttpService {
+public final class ActivityController implements Controller {
 
   private static final Logger LOG = LoggerFactory.getLogger(
       ActivityController.class);

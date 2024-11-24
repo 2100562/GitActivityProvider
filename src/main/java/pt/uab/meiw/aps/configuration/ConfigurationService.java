@@ -2,6 +2,7 @@ package pt.uab.meiw.aps.configuration;
 
 import java.util.List;
 import java.util.Map;
+import pt.uab.meiw.aps.Service;
 
 /**
  * A Configuration Service must provide two methods, one that returns the
@@ -11,7 +12,7 @@ import java.util.Map;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public interface ConfigurationService {
+public interface ConfigurationService extends Service {
 
   /**
    * Returns the Configuration Parameters.
