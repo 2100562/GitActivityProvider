@@ -1,7 +1,6 @@
 package pt.uab.meiw.aps.configuration.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.helidon.config.Config;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -9,8 +8,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import pt.uab.meiw.aps.DeserializationException;
+import pt.uab.meiw.aps.Serdes;
 import pt.uab.meiw.aps.Utils;
 import pt.uab.meiw.aps.configuration.ConfigurationService;
 
@@ -30,9 +29,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   private final List<Map<String, Object>> configurationParameters;
   private final String configurationInterface;
 
-  public ConfigurationServiceImpl(ObjectMapper om, Config config) {
-    Objects.requireNonNull(om, "Object Mapper must not be null");
-    Objects.requireNonNull(config, "Config must not be null");
+  public ConfigurationServiceImpl() {
+    final var om = Serdes.INSTANCE.getObjectMapper();
+    final var config = Config.global();
 
     final var configParPath = config
         .get("ap")

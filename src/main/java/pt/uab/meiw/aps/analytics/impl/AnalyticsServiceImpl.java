@@ -1,11 +1,10 @@
 package pt.uab.meiw.aps.analytics.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.helidon.config.Config;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Objects;
 import pt.uab.meiw.aps.DeserializationException;
+import pt.uab.meiw.aps.Serdes;
 import pt.uab.meiw.aps.Utils;
 import pt.uab.meiw.aps.analytics.AnalyticsContract;
 import pt.uab.meiw.aps.analytics.AnalyticsService;
@@ -24,9 +23,9 @@ public final class AnalyticsServiceImpl implements AnalyticsService {
 
   private final AnalyticsContract analyticsContract;
 
-  public AnalyticsServiceImpl(ObjectMapper om, Config config) {
-    Objects.requireNonNull(om, "Object Mapper must not be null");
-    Objects.requireNonNull(config, "Config must not be null");
+  public AnalyticsServiceImpl() {
+    final var om = Serdes.INSTANCE.getObjectMapper();
+    final var config = Config.global();
 
     final var analyticsContractPath = config
         .get("ap")

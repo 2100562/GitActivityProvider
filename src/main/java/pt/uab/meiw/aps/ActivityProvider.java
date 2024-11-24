@@ -35,10 +35,10 @@ public final class ActivityProvider {
 
     final var om = new ObjectMapper();
 
-    final var configService = new ConfigurationServiceImpl(om, config);
+    final var configService = new ConfigurationServiceImpl();
     final var configController = new ConfigurationController(configService);
 
-    final var analyticsService = new AnalyticsServiceImpl(om, config);
+    final var analyticsService = new AnalyticsServiceImpl();
     final var analyticsController = new AnalyticsController(analyticsService);
 
     final var activityController = new ActivityController();
