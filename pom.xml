@@ -85,6 +85,17 @@
       <version>${version.jackson}</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.helidon.webclient</groupId>
+      <artifactId>helidon-webclient</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.helidon.webclient</groupId>
+      <artifactId>helidon-webclient-http2</artifactId>
+    </dependency>
+
+
     <!-- Logging with SLF4j with Log4j as logging implementation -->
     <dependency>
       <groupId>io.helidon.logging</groupId>
