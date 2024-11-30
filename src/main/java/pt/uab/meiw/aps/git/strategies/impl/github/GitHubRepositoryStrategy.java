@@ -27,7 +27,7 @@ import pt.uab.meiw.aps.git.strategies.model.github.Tree;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public class GitHubRepositoryStrategy implements GitRepositoryStrategy {
+public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
 
   private final ObjectMapper mapper = Serdes.INSTANCE.getObjectMapper();
   private final Pattern urlPattern = Pattern.compile(
@@ -71,45 +71,28 @@ public class GitHubRepositoryStrategy implements GitRepositoryStrategy {
   private String repoApiUrl(RepositoryDetails details) {
     final var sb = new StringBuilder();
 
-    return sb
-        .append("/repos/")
-        .append(details.username)
-        .append("/")
-        .append(details.name)
-        .toString();
+    return sb.append("/repos/").append(details.username).append("/")
+        .append(details.name).toString();
   }
 
   private String treeApiUrl(RepositoryDetails details, String branch) {
     final var sb = new StringBuilder();
 
-    return sb
-        .append("/repos/")
-        .append(details.username)
-        .append("/")
-        .append(details.name)
-        .append("/git/trees/")
-        .append(branch)
-        .toString();
+    return sb.append("/repos/").append(details.username).append("/")
+        .append(details.name).append("/git/trees/").append(branch).toString();
   }
 
   private String commitsApiUrl(RepositoryDetails details) {
     final var sb = new StringBuilder();
 
-    return sb
-        .append("/repos/")
-        .append(details.username)
-        .append("/")
-        .append(details.name)
-        .append("/commits")
-        .toString();
+    return sb.append("/repos/").append(details.username).append("/")
+        .append(details.name).append("/commits").toString();
   }
 
   private List<Commit> getCommits(String repositoryUrl) throws IOException {
     final var repoDetails = detailsFromUrl(repositoryUrl);
     try {
-      final var resp = client
-          .get()
-          .path(commitsApiUrl(repoDetails))
+      final var resp = client.get().path(commitsApiUrl(repoDetails))
           .request(String.class);
 
       if (!resp.status().equals(Status.OK_200)) {
@@ -128,8 +111,25 @@ public class GitHubRepositoryStrategy implements GitRepositoryStrategy {
   private Instant getCommitDate(Commit commit) {
     return Instant.parse(
         ((Map<String, Map<String, String>>) commit.getAdditionalProperties()
-            .get("commit")).get("author").get(
-            "date"));
+            .get("commit")).get("author").get("date"));
+  }
+
+  @Override
+  public boolean canFetchMetrics(String repositoryUrl) throws IOException {
+    final var repoDetails = detailsFromUrl(repositoryUrl);
+
+    try {
+      final var resp = client.get().path(repoApiUrl(repoDetails))
+          .request(String.class);
+
+      if (resp.status().equals(Status.OK_200)) {
+        return true;
+      }
+    } catch (Exception e) {
+      throw new IOException(e.getMessage(), e);
+    }
+
+    return false;
   }
 
   @Override
@@ -139,8 +139,7 @@ public class GitHubRepositoryStrategy implements GitRepositoryStrategy {
     GetRepository response;
 
     try {
-      final var resp = client.get()
-          .path(repoApiUrl(repoDetails))
+      final var resp = client.get().path(repoApiUrl(repoDetails))
           .request(String.class);
 
       if (!resp.status().equals(Status.OK_200)) {
@@ -175,11 +174,8 @@ public class GitHubRepositoryStrategy implements GitRepositoryStrategy {
     GetTree response;
 
     try {
-      final var resp = client
-          .get()
-          .path(treeApiUrl(repoDetails, branch))
-          .queryParam("recursive", "1")
-          .request(String.class);
+      final var resp = client.get().path(treeApiUrl(repoDetails, branch))
+          .queryParam("recursive", "1").request(String.class);
 
       if (!resp.status().equals(Status.OK_200)) {
         return Set.of();
@@ -190,10 +186,7 @@ public class GitHubRepositoryStrategy implements GitRepositoryStrategy {
       throw new IOException(e.getMessage(), e);
     }
 
-    return response
-        .getTree()
-        .stream()
-        .map(Tree::getPath)
+    return response.getTree().stream().map(Tree::getPath)
         .collect(Collectors.toSet());
   }
 
@@ -206,11 +199,8 @@ public class GitHubRepositoryStrategy implements GitRepositoryStrategy {
   @Override
   public long getRepositoryAvgDurationBetweenCommits(String repositoryUrl)
       throws IOException {
-    final var commitDates = getCommits(repositoryUrl)
-        .stream()
-        .map(this::getCommitDate)
-        .sorted()
-        .toList();
+    final var commitDates = getCommits(repositoryUrl).stream()
+        .map(this::getCommitDate).sorted().toList();
 
     var seconds = 0L;
     for (int i = 1; i < commitDates.size(); i++) {

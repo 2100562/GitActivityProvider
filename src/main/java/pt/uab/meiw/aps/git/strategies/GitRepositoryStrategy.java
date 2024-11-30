@@ -14,6 +14,16 @@ import java.util.Set;
 public interface GitRepositoryStrategy {
 
   /**
+   * Indicates if the given repository is accessible.
+   *
+   * @param repositoryUrl the repository URL to check
+   * @return true if accessible, false otherwise.
+   * @throws IOException when unable to establish connection to the target
+   *                     repository.
+   */
+  boolean canFetchMetrics(String repositoryUrl) throws IOException;
+
+  /**
    * Returns the repository creation date.
    *
    * @param repositoryUrl the repository URL to get the creation date from.

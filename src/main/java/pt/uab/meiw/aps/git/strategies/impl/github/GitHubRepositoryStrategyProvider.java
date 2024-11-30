@@ -12,7 +12,7 @@ import pt.uab.meiw.aps.git.strategies.GitRepositoryStrategyProvider;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public class GitHubRepositoryStrategyProvider implements
+public final class GitHubRepositoryStrategyProvider implements
     GitRepositoryStrategyProvider {
 
   private final Config config = Config.global();
