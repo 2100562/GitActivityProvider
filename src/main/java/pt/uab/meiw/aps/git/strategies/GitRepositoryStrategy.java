@@ -47,8 +47,7 @@ public interface GitRepositoryStrategy {
       throws IOException;
 
   /**
-   * Returns the commit count for the main/master branch for the given
-   * repository.
+   * Returns the commit count for the given repository.
    *
    * @param repositoryUrl the repository URL to get the commit count from.
    * @return the commit count.
@@ -56,19 +55,6 @@ public interface GitRepositoryStrategy {
    *                     repository.
    */
   long getRepositoryCommitCount(String repositoryUrl) throws IOException;
-
-  /**
-   * Returns the commit count for the main/master branch for the given
-   * repository.
-   *
-   * @param repositoryUrl the repository URL to get the commit count from.
-   * @param branch        the repository branch to get the commit count from.
-   * @return the commit count.
-   * @throws IOException when unable to establish connection to the target
-   *                     repository.
-   */
-  long getRepositoryCommitCount(String repositoryUrl, String branch)
-      throws IOException;
 
   /**
    * Returns the average duration, in seconds, between commits for the
@@ -81,20 +67,6 @@ public interface GitRepositoryStrategy {
    */
   long getRepositoryAvgDurationBetweenCommits(String repositoryUrl)
       throws IOException;
-
-  /**
-   * Returns the average duration, in seconds, between commits for the
-   * main/master branch for the given repository.
-   *
-   * @param repositoryUrl the repository URL to get average from.
-   * @param branch        the repository branch to get average from.
-   * @return the average duration, in seconds.
-   * @throws IOException when unable to establish connection to the target
-   *                     repository.
-   */
-  long getRepositoryAvgDurationBetweenCommits(String repositoryUrl,
-      String branch) throws IOException;
-
 
   /**
    * Returns the file count for the main/master branch for the given
