@@ -1,6 +1,6 @@
 package pt.uab.meiw.aps.git.strategies;
 
-import java.util.Iterator;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 /**
@@ -20,19 +20,20 @@ public interface GitRepositoryStrategyProvider {
    * if any.
    *
    * @param repositoryUrl the repository URL.
-   * @return the provider instance of null.
+   * @return the provider instance or empty.
    */
-  static GitRepositoryStrategyProvider getProviderFor(String repositoryUrl) {
+  static Optional<GitRepositoryStrategyProvider> getProviderFor(
+      String repositoryUrl) {
     final var serviceLoader = ServiceLoader.load(
         GitRepositoryStrategyProvider.class);
 
     for (final var provider : serviceLoader) {
       if (provider.accepts(repositoryUrl)) {
-        return provider;
+        return Optional.of(provider);
       }
     }
 
-    return null;
+    return Optional.empty();
   }
 
   /**
