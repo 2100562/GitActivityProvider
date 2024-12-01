@@ -12,13 +12,14 @@ import pt.uab.meiw.aps.configuration.impl.ConfigurationServiceImpl;
  */
 public final class ConfigurationServiceFactory implements ServiceFactory {
 
+  private static final Service INSTANCE = new ConfigurationServiceImpl();
+
   public ConfigurationServiceFactory() {
 
   }
 
-
   @Override
   public Service create() {
-    return new ConfigurationServiceImpl();
+    return INSTANCE;
   }
 }

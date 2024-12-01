@@ -1,8 +1,11 @@
 package pt.uab.meiw.aps;
 
 import pt.uab.meiw.aps.activity.ActivityControllerFactory;
+import pt.uab.meiw.aps.activity.ActivityServiceFactory;
 import pt.uab.meiw.aps.analytics.AnalyticsControllerFactory;
+import pt.uab.meiw.aps.analytics.AnalyticsServiceFactory;
 import pt.uab.meiw.aps.configuration.ConfigurationControllerFactory;
+import pt.uab.meiw.aps.configuration.ConfigurationServiceFactory;
 
 /**
  * The Controller Abstract Factory.
@@ -11,6 +14,17 @@ import pt.uab.meiw.aps.configuration.ConfigurationControllerFactory;
  * @since 0.0.1
  */
 public final class AbstractControllerFactory {
+
+  private static final ServiceFactory CONFIG_SV_FACTORY = new ConfigurationServiceFactory();
+  private static final ServiceFactory ANALYTICS_SV_FACTORY = new AnalyticsServiceFactory();
+  private static final ServiceFactory ACTIVITY_SV_FACTORY = new ActivityServiceFactory(
+      ANALYTICS_SV_FACTORY);
+  private static final ControllerFactory CONFIG_CTRL_FACTORY = new ConfigurationControllerFactory(
+      CONFIG_SV_FACTORY);
+  private static final ControllerFactory ANALYTICS_CTRL_FACTORY = new AnalyticsControllerFactory(
+      ANALYTICS_SV_FACTORY);
+  private static final ControllerFactory ACTIVITY_CTRL_FACTORY = new ActivityControllerFactory(
+      ACTIVITY_SV_FACTORY);
 
   public AbstractControllerFactory() {
 
@@ -25,9 +39,9 @@ public final class AbstractControllerFactory {
   public Controller createController(ControllerType type) {
 
     return switch (type) {
-      case Configuration -> new ConfigurationControllerFactory().create();
-      case Analytics -> new AnalyticsControllerFactory().create();
-      case Activity -> new ActivityControllerFactory().create();
+      case Configuration -> CONFIG_CTRL_FACTORY.create();
+      case Analytics -> ANALYTICS_CTRL_FACTORY.create();
+      case Activity -> ACTIVITY_CTRL_FACTORY.create();
     };
   }
 }

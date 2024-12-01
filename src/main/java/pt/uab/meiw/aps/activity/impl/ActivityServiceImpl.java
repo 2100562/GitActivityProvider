@@ -7,13 +7,23 @@ import pt.uab.meiw.aps.Utils;
 import pt.uab.meiw.aps.activity.ActivityService;
 import pt.uab.meiw.aps.activity.DeployRequest;
 import pt.uab.meiw.aps.activity.model.ActivityInstance;
+import pt.uab.meiw.aps.analytics.AnalyticsService;
 
+/**
+ * The Activity Service default implementation providing methods to create new
+ * Activity Instances.
+ *
+ * @author Hugo Gonçalves
+ * @since 0.0.1
+ */
 public final class ActivityServiceImpl implements ActivityService {
 
   private final DbClient dbClient;
   private final String activityInterface;
+  private final AnalyticsService analyticsService;
 
-  public ActivityServiceImpl() {
+  public ActivityServiceImpl(AnalyticsService analyticsService) {
+    this.analyticsService = analyticsService;
     final var config = Config.global();
     dbClient = DbClient.create(config.get("db"));
 
@@ -53,7 +63,7 @@ public final class ActivityServiceImpl implements ActivityService {
     var rows = dbClient
         .execute()
         .createNamedUpdate("update-activity-repository")
-        .addParam("id",id)
+        .addParam("id", id)
         .addParam("repositoryUrl", repositoryUrl)
         .execute();
 

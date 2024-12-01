@@ -12,15 +12,15 @@ import pt.uab.meiw.aps.ServiceFactory;
  */
 public final class AnalyticsControllerFactory implements ControllerFactory {
 
-  private final ServiceFactory serviceFactory;
+  private final Controller instance;
 
-  public AnalyticsControllerFactory() {
-    serviceFactory = new AnalyticsServiceFactory();
+  public AnalyticsControllerFactory(ServiceFactory serviceFactory) {
+    instance = new AnalyticsController(
+        (AnalyticsService) serviceFactory.create());
   }
 
   @Override
   public Controller create() {
-    return new AnalyticsController(
-        (AnalyticsService) serviceFactory.create());
+    return instance;
   }
 }

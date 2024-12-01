@@ -12,12 +12,14 @@ import pt.uab.meiw.aps.analytics.impl.AnalyticsServiceImpl;
  */
 public final class AnalyticsServiceFactory implements ServiceFactory {
 
+  private static final Service INSTANCE = new AnalyticsServiceImpl();
+
   public AnalyticsServiceFactory() {
 
   }
 
   @Override
   public Service create() {
-    return new AnalyticsServiceImpl();
+    return INSTANCE;
   }
 }
