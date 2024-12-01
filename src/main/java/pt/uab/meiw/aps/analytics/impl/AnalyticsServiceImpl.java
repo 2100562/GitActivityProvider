@@ -1,16 +1,16 @@
 package pt.uab.meiw.aps.analytics.impl;
 
 import io.helidon.config.Config;
+import io.helidon.dbclient.DbClient;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.time.Duration;
+import java.util.List;
 import pt.uab.meiw.aps.DeserializationException;
 import pt.uab.meiw.aps.Serdes;
 import pt.uab.meiw.aps.Utils;
 import pt.uab.meiw.aps.analytics.AnalyticsContract;
 import pt.uab.meiw.aps.analytics.AnalyticsService;
+import pt.uab.meiw.aps.analytics.model.ActivityAnalytics;
 import pt.uab.meiw.aps.git.GitService;
 
 /**
@@ -26,17 +26,17 @@ import pt.uab.meiw.aps.git.GitService;
 public final class AnalyticsServiceImpl implements AnalyticsService {
 
   private static final String DESER_ERR = "Exception while deserializing configuration parameters";
-  private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-  private static final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
   private final AnalyticsContract analyticsContract;
-
   private final GitService gitService;
+  private final DbClient dbClient;
 
   public AnalyticsServiceImpl(GitService gitService) {
     this.gitService = gitService;
     final var om = Serdes.INSTANCE.getObjectMapper();
     final var config = Config.global();
+
+    dbClient = DbClient.create(config.get("db"));
 
     final var analyticsContractPath = config.get("ap").get("analytics")
         .get("contract-path").asString().orElse("");
@@ -61,8 +61,14 @@ public final class AnalyticsServiceImpl implements AnalyticsService {
   }
 
   @Override
-  public Object getAnalytics() {
-    return Collections.emptyList();
+  public List<ActivityAnalytics> getAnalytics(String activityId) {
+    return dbClient
+        .execute()
+        .createNamedQuery("get-analytics")
+        .addParam("externalActivityId", activityId)
+        .execute()
+        .map(row -> row.as(ActivityAnalytics.class))
+        .toList();
   }
 
   @Override

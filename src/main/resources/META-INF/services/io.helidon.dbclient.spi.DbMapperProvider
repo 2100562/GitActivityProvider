@@ -1,1 +1,3 @@
 pt.uab.meiw.aps.activity.model.ActivityInstanceMapperProvider
+pt.uab.meiw.aps.analytics.model.ActivityAnalyticsMapperProvider
+pt.uab.meiw.aps.analytics.model.MetricWithValueMapperProvider

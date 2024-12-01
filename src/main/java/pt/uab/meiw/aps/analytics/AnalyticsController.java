@@ -4,6 +4,7 @@ import io.helidon.webserver.http.Handler;
 import io.helidon.webserver.http.HttpRules;
 import io.helidon.webserver.http.ServerRequest;
 import io.helidon.webserver.http.ServerResponse;
+import pt.uab.meiw.aps.AnalyticsRequest;
 import pt.uab.meiw.aps.Constants;
 import pt.uab.meiw.aps.Controller;
 
@@ -79,10 +80,20 @@ public final class AnalyticsController implements Controller {
 
     @Override
     public void handle(ServerRequest req, ServerResponse res) throws Exception {
+
+      AnalyticsRequest request;
+
+      try {
+        request = req.content().as(AnalyticsRequest.class);
+      } catch (Exception e) {
+        res.status(400).send();
+        return;
+      }
+
       res
           .status(200)
           .header("Content-Type", Constants.CONTENT_TYPE_JSON)
-          .send(analyticsService.getAnalytics());
+          .send(analyticsService.getAnalytics(request.getActivityId()));
     }
   }
 }

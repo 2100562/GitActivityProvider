@@ -1,6 +1,8 @@
 package pt.uab.meiw.aps.analytics;
 
+import java.util.List;
 import pt.uab.meiw.aps.Service;
+import pt.uab.meiw.aps.analytics.model.ActivityAnalytics;
 
 /**
  * The Analytics Service must provide two methods, one that returns the
@@ -21,11 +23,12 @@ public interface AnalyticsService extends Service {
   AnalyticsContract getAnalyticsContract();
 
   /**
-   * Returns an empty List.
+   * Fetches activity analytics for all students for the given activity id.
    *
-   * @return an empty List.
+   * @param activityId the activity id to fetch analytics.
+   * @return a collection of analytics, if any.
    */
-  Object getAnalytics();
+  List<ActivityAnalytics> getAnalytics(String activityId);
 
   /**
    * Tests if the given URL is valid and the service is able to start

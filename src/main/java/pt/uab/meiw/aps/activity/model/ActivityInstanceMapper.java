@@ -19,12 +19,14 @@ public class ActivityInstanceMapper implements DbMapper<ActivityInstance> {
   public ActivityInstance read(DbRow dbRow) {
     final var aI = new ActivityInstance();
 
-    aI.setId(dbRow.column("_id").toString());
-    aI.setActivityName(dbRow.column("activityName").toString());
-    aI.setActivityInstructions(dbRow.column("activityInstructions").toString());
-    aI.setExternalActivityId(dbRow.column("externalActivityId").toString());
-    aI.setExternalStudentId(dbRow.column("externalStudentId").toString());
-    aI.setRepositoryUrl(dbRow.column("repositoryUrl").toString());
+    aI.setId(dbRow.column("_id").asString().get());
+    aI.setActivityName(dbRow.column("activityName").asString().get());
+    aI.setActivityInstructions(
+        dbRow.column("activityInstructions").asString().get());
+    aI.setExternalActivityId(
+        dbRow.column("externalActivityId").asString().get());
+    aI.setExternalStudentId(dbRow.column("externalStudentId").asString().get());
+    aI.setRepositoryUrl(dbRow.column("repositoryUrl").asString().get());
 
     return aI;
   }

@@ -9,7 +9,7 @@ import java.util.StringJoiner;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public final class Metric {
+public class Metric {
 
   private String name;
   private String type;
