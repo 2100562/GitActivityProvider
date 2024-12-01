@@ -3,6 +3,7 @@ package pt.uab.meiw.aps.analytics;
 import pt.uab.meiw.aps.Service;
 import pt.uab.meiw.aps.ServiceFactory;
 import pt.uab.meiw.aps.analytics.impl.AnalyticsServiceImpl;
+import pt.uab.meiw.aps.git.GitService;
 
 /**
  * The Analytics Service Factory.
@@ -12,14 +13,15 @@ import pt.uab.meiw.aps.analytics.impl.AnalyticsServiceImpl;
  */
 public final class AnalyticsServiceFactory implements ServiceFactory {
 
-  private static final Service INSTANCE = new AnalyticsServiceImpl();
+  private final Service instance;
 
-  public AnalyticsServiceFactory() {
-
+  public AnalyticsServiceFactory(ServiceFactory gitServiceFactory) {
+    instance = new AnalyticsServiceImpl(
+        (GitService) gitServiceFactory.create());
   }
 
   @Override
   public Service create() {
-    return INSTANCE;
+    return instance;
   }
 }
