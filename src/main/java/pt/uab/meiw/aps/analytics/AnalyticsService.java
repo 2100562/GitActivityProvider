@@ -26,4 +26,20 @@ public interface AnalyticsService extends Service {
    * @return an empty List.
    */
   Object getAnalytics();
+
+  /**
+   * Tests if the given URL is valid and the service is able to start
+   * collection.
+   *
+   * @param repositoryUrl the repository URL to test.
+   * @return true if able to start collection, false otherwise.
+   */
+  boolean canStartCollection(String repositoryUrl);
+
+  /**
+   * Starts the periodic collection of metrics.
+   *
+   * @param repositoryUrl the repository URL to start the collection.
+   */
+  void startCollection(String repositoryUrl);
 }

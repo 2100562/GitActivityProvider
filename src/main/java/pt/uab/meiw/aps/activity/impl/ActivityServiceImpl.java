@@ -60,6 +60,10 @@ public final class ActivityServiceImpl implements ActivityService {
 
   @Override
   public ActivityInstance setRepository(String id, String repositoryUrl) {
+    if (!analyticsService.canStartCollection(repositoryUrl)) {
+      throw new RuntimeException("Unable to start analytics collection");
+    }
+
     var rows = dbClient
         .execute()
         .createNamedUpdate("update-activity-repository")
@@ -68,8 +72,10 @@ public final class ActivityServiceImpl implements ActivityService {
         .execute();
 
     if (rows != 1) {
-      throw new RuntimeException("Failed to create activity instance");
+      throw new RuntimeException("Failed to update activity instance");
     }
+
+    analyticsService.startCollection(repositoryUrl);
 
     return getActivity(id);
   }

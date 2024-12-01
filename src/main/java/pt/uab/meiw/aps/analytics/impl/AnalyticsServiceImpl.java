@@ -57,4 +57,14 @@ public final class AnalyticsServiceImpl implements AnalyticsService {
   public Object getAnalytics() {
     return Collections.emptyList();
   }
+
+  @Override
+  public boolean canStartCollection(String repositoryUrl) {
+    return false;
+  }
+
+  @Override
+  public void startCollection(String repositoryUrl) {
+
+  }
 }
