@@ -1,5 +1,6 @@
 package pt.uab.meiw.aps.activity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.helidon.webserver.http.Handler;
 import io.helidon.webserver.http.HttpRules;
 import io.helidon.webserver.http.ServerRequest;
@@ -7,10 +8,12 @@ import io.helidon.webserver.http.ServerResponse;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pt.uab.meiw.aps.Constants;
 import pt.uab.meiw.aps.Controller;
+import pt.uab.meiw.aps.Serdes;
 
 /**
  * The Activity Controller is responsible for configuring the Helidon Webserver
@@ -26,6 +29,12 @@ public final class ActivityController implements Controller {
   private static final Logger LOG = LoggerFactory.getLogger(
       ActivityController.class);
 
+  private final ActivityService activityService;
+
+  public ActivityController(ActivityService activityService) {
+    this.activityService = activityService;
+  }
+
   /**
    * Invoked by Helidon Webserver to configure the REST routes.
    *
@@ -33,9 +42,11 @@ public final class ActivityController implements Controller {
    */
   @Override
   public void routing(HttpRules httpRules) {
-    final var activityDeploy = new ActivityDeployHandler();
-    final var activityProvideGet = new ActivityProvideGetHandler();
-    final var activityProvidePost = new ActivityProvidePostHandler();
+    final var activityDeploy = new ActivityDeployHandler(activityService);
+    final var activityProvideGet = new ActivityProvideGetHandler(
+        activityService);
+    final var activityProvidePost = new ActivityProvidePostHandler(
+        activityService);
 
     httpRules
         .post("/deploy", activityDeploy)
@@ -51,6 +62,13 @@ public final class ActivityController implements Controller {
    */
   private static final class ActivityDeployHandler implements Handler {
 
+    private final ObjectMapper mapper = Serdes.INSTANCE.getObjectMapper();
+    private final ActivityService activityService;
+
+    private ActivityDeployHandler(ActivityService activityService) {
+      this.activityService = activityService;
+    }
+
     @Override
     public void handle(ServerRequest req, ServerResponse res) throws Exception {
       DeployRequest request = null;
@@ -58,31 +76,35 @@ public final class ActivityController implements Controller {
 
       try {
         request = req.content().as(DeployRequest.class);
-        status = 200;
         LOG.info("Received deploy request: {}", request);
       } catch (RuntimeException e) {
-        status = 400;
+        res.status(400).send();
+        return;
       }
+
+      final var activity = activityService.createFor(request);
+      final var activityEncoded = new String(
+          Base64.getEncoder()
+              .encode(mapper.writeValueAsString(activity).getBytes(
+                  StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 
       // Find redirect URL
       final var orig = req.requestedUri().toUri();
-      String url = "";
+      final var query =
+          "id=" + activity.getId() +
+              "&data=" + activityEncoded;
 
-      if (request != null) {
-        final var id =
-            "id=" + URLEncoder.encode(request.getActivityId(),
-                StandardCharsets.UTF_8);
-        url = new URI(
-            orig.getScheme(),
-            orig.getAuthority(),
-            "/activity",
-            id,
-            null
-        ).toURL().toString();
-      }
+      final var url = new URI(
+          orig.getScheme(),
+          orig.getAuthority(),
+          "/activity",
+          query,
+          null
+      )
+          .toURL()
+          .toString();
 
-      // MVP takes no actions, only acks the request.
-      res.status(status).send(url);
+      res.status(200).send(url);
     }
   }
 
@@ -96,18 +118,24 @@ public final class ActivityController implements Controller {
    */
   private static final class ActivityProvideGetHandler implements Handler {
 
+    private final ActivityService activityService;
+
+    private ActivityProvideGetHandler(ActivityService activityService) {
+      this.activityService = activityService;
+    }
+
     @Override
     public void handle(ServerRequest req, ServerResponse res) throws Exception {
-      if (!req.query().contains("id")) {
+      if (!req.query().contains("id") || !req.query().contains("data")) {
         res
             .status(400)
             .header("Content-Type", Constants.CONTENT_TYPE_HTML)
-            .send("Missing Activity id");
+            .send("Missing Activity details");
       } else {
         res
             .status(200)
             .header("Content-Type", Constants.CONTENT_TYPE_HTML)
-            .send("Git Activity id: " + req.query().get("id"));
+            .send(activityService.getActivityInterface());
       }
     }
   }
@@ -121,6 +149,12 @@ public final class ActivityController implements Controller {
    */
   private static final class ActivityProvidePostHandler implements Handler {
 
+    private final ActivityService activityService;
+
+    private ActivityProvidePostHandler(ActivityService activityService) {
+      this.activityService = activityService;
+    }
+
     @Override
     public void handle(ServerRequest req, ServerResponse res) throws Exception {
 
@@ -131,6 +165,7 @@ public final class ActivityController implements Controller {
         request = req.content().as(ProvideRequest.class);
         status = 200;
         LOG.info("ProvideRequest deploy request: {}", request);
+        activityService.setRepository(request.getActivityId(), request.getGitRepositoryUrl());
       } catch (RuntimeException e) {
         status = 400;
       }

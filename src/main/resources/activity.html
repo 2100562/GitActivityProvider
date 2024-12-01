@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Activity Provider</title>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+
+      const data = JSON.parse(window.atob(urlParams.get('data')));
+      localStorage.setItem('activityId', data.id);
+      localStorage.setItem('studentId', data.externalStudentId);
+      document.getElementById('activityName').innerText = data.activityName;
+      document.getElementById(
+          'activityInstructions').innerText = data.activityInstructions;
+    });
+  </script>
+</head>
+<body>
+<div>
+  <h1>Git Activity Provider</h1>
+  <h3 id="activityName">Activity Name</h3>
+  <p id="activityInstructions">Activity Instructions</p>
+  <p>
+    <label for="repoUrl">Repository URL</label><br>
+    <input type="text" id="repoUrl"
+           placeholder="https://..."
+           required/>
+  </p>
+  <a href="#" onclick="return start(event)">Start</a>
+  <script>
+    function start(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      const repoUrl = document.getElementById('repoUrl').value;
+      const activityId = localStorage.getItem("activityId");
+      const studentId = localStorage.getItem("studentId");
+      const url = window.location.protocol + "//" + window.location.host
+          + "/activity";
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          studentId: studentId,
+          activityId: activityId,
+          gitRepositoryUrl: repoUrl,
+        }),
+        mode: 'cors'
+      })
+      .then(() => window.location = repoUrl)
+      .catch(error => console.error(error));
+      return false;
+    }
+  </script>
+</div>
+</body>
+</html>
