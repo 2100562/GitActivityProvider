@@ -28,13 +28,23 @@ public final class GitHubRepositoryStrategyProvider implements
         .asString()
         .get();
 
-    final var client = WebClient
+    final var token = config
+        .get("ap")
+        .get("git")
+        .get("strategies")
+        .get("github")
+        .get("token")
+        .asString()
+        .get();
+
+    final var clientBuilder = WebClient
         .builder()
         .baseUri(baseUri)
-        .config(config.get("ap.git.strategies.github.client"))
-        .build();
+        .config(config.get("ap.git.strategies.github.client"));
 
-    return new GitHubRepositoryStrategy(client);
+    clientBuilder.defaultHeadersMap().put("Authorization", token);
+
+    return new GitHubRepositoryStrategy(clientBuilder.build());
   }
 
   @Override
