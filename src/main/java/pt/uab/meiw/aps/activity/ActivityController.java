@@ -8,6 +8,7 @@ import io.helidon.webserver.http.ServerResponse;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pt.uab.meiw.aps.Constants;
@@ -103,7 +104,10 @@ public final class ActivityController implements Controller {
           .toURL()
           .toString();
 
-      res.status(200).send(url);
+      res
+          .status(200)
+          .header("Content-Type", Constants.CONTENT_TYPE_JSON)
+          .send(Collections.singletonMap("deployURL", url));
     }
   }
 
