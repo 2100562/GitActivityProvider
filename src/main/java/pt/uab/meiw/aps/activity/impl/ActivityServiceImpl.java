@@ -39,6 +39,14 @@ public final class ActivityServiceImpl implements ActivityService {
     activityInterface = activityHtmlFile
         .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
         .orElse("");
+
+    // Re-start any previously started collections, for crash/restart scenários.
+    dbClient
+        .execute()
+        .createNamedQuery("get-activities-with-collection")
+        .execute()
+        .map(row -> row.as(ActivityInstance.class))
+        .forEach(analyticsService::startCollection);
   }
 
   @Override
