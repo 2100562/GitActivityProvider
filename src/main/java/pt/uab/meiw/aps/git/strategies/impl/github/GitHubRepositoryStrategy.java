@@ -202,15 +202,15 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
     final var commitDates = getCommits(repositoryUrl).stream()
         .map(this::getCommitDate).sorted().toList();
 
-    var seconds = 0L;
+    var ms = 0L;
     for (int i = 1; i < commitDates.size(); i++) {
       final var duration = Duration.between(commitDates.get(i - 1),
           commitDates.get(i));
-      seconds += duration.getSeconds();
+      ms += duration.toMillis();
     }
 
     int count = commitDates.size() - 1;
-    return count > 0 ? seconds / count : 0;
+    return count > 0 ? ms / count : 0;
   }
 
   @Override
