@@ -51,7 +51,13 @@
         }),
         mode: 'cors'
       })
-      .then(() => window.location = repoUrl)
+      .then((res) => {
+        if (res.ok) {
+          window.location = repoUrl
+        } else {
+          console.error(res.statusText);
+        }
+      })
       .catch(error => console.error(error));
       return false;
     }

@@ -1,7 +1,9 @@
 package pt.uab.meiw.aps.analytics.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
 import java.util.StringJoiner;
+import org.bson.Document;
 import pt.uab.meiw.aps.analytics.Metric;
 
 /**
@@ -11,7 +13,7 @@ import pt.uab.meiw.aps.analytics.Metric;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public final class MetricWithValue<T> extends Metric {
+public final class MetricWithValue<T> extends Metric implements AsDocument {
 
   private T value;
 
@@ -24,6 +26,14 @@ public final class MetricWithValue<T> extends Metric {
 
   public void setValue(T value) {
     this.value = value;
+  }
+
+  @JsonIgnore
+  @Override
+  public Document getDocument() {
+    return new Document("name", getName())
+        .append("type", getType())
+        .append("value", getValue());
   }
 
   @Override

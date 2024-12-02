@@ -2,10 +2,10 @@ package pt.uab.meiw.aps.analytics.model;
 
 import io.helidon.dbclient.DbMapper;
 import io.helidon.dbclient.DbRow;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.bson.Document;
 
 /**
  * A Helidon DBClient Model Mapper.
@@ -15,16 +15,19 @@ import java.util.Map;
  */
 public class ActivityAnalyticsMapper implements DbMapper<ActivityAnalytics> {
 
+  private static final MetricWithValueMapper METRIC_MAPPER = new MetricWithValueMapper();
+
   @SuppressWarnings("unchecked")
   @Override
   public ActivityAnalytics read(DbRow row) {
     final var aa = new ActivityAnalytics();
-
     aa.setInveniraStdID(row.column("inveniraStdID").asString().get());
     aa.setQualitativeAnalytics(
-        row.column("qualitativeAnalytics").as(List.class).get());
+        row.column("qualAnalytics").as(List.class).get().stream()
+            .map(ActivityAnalyticsMapper::mapMetric).toList());
     aa.setQuantitativeAnalytics(
-        row.column("quantitativeAnalytics").as(List.class).get());
+        row.column("quantAnalytics").as(List.class).get().stream()
+            .map(ActivityAnalyticsMapper::mapMetric).toList());
     aa.setExternalActivityId(row.column("externalActivityId").asString().get());
 
     return aa;
@@ -32,25 +35,25 @@ public class ActivityAnalyticsMapper implements DbMapper<ActivityAnalytics> {
 
   @Override
   public Map<String, ?> toNamedParameters(ActivityAnalytics value) {
-    final var map = new HashMap<String, Object>();
-
-    map.put("inveniraStdID", value.getInveniraStdID());
-    map.put("qualitativeAnalytics", value.getQualitativeAnalytics());
-    map.put("quantitativeAnalytics", value.getQuantitativeAnalytics());
-    map.put("externalActivityId", value.getExternalActivityId());
-
-    return map;
+    return null;
   }
 
   @Override
   public List<?> toIndexedParameters(ActivityAnalytics value) {
-    final var list = new LinkedList<>();
+    return null;
+  }
 
-    list.add(value.getInveniraStdID());
-    list.add(value.getQualitativeAnalytics());
-    list.add(value.getQuantitativeAnalytics());
-    list.add(value.getExternalActivityId());
+  private static MetricWithValue<?> mapMetric(Document doc) {
+    final var metric = new MetricWithValue<>();
 
-    return list;
+    metric.setName(doc.getString("name"));
+    metric.setType(doc.getString("type"));
+    metric.setValue(doc.get("value"));
+
+    return metric;
+  }
+
+  private static MetricWithValue<?> mapMetric(Object doc) {
+    return mapMetric((Document) doc);
   }
 }

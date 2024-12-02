@@ -2,10 +2,10 @@ package pt.uab.meiw.aps.analytics.model;
 
 import io.helidon.dbclient.DbMapper;
 import io.helidon.dbclient.DbRow;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.bson.Document;
 
 /**
  * A Helidon DBClient Model Mapper.
@@ -28,23 +28,11 @@ public class MetricWithValueMapper implements DbMapper<MetricWithValue<?>> {
 
   @Override
   public Map<String, ?> toNamedParameters(MetricWithValue value) {
-    final var map = new HashMap<String, Object>();
-
-    map.put("name", value.getName());
-    map.put("type", value.getType());
-    map.put("value", value.getValue());
-
-    return map;
+    return null;
   }
 
   @Override
   public List<?> toIndexedParameters(MetricWithValue value) {
-    final var list = new LinkedList<>();
-
-    list.add(value.getName());
-    list.add(value.getType());
-    list.add(value.getValue());
-
-    return list;
+    return null;
   }
 }

@@ -2,6 +2,7 @@ package pt.uab.meiw.aps.analytics;
 
 import java.util.List;
 import pt.uab.meiw.aps.Service;
+import pt.uab.meiw.aps.activity.model.ActivityInstance;
 import pt.uab.meiw.aps.analytics.model.ActivityAnalytics;
 
 /**
@@ -42,7 +43,7 @@ public interface AnalyticsService extends Service {
   /**
    * Starts the periodic collection of metrics.
    *
-   * @param repositoryUrl the repository URL to start the collection.
+   * @param activityInstance the activity to start the collection.
    */
-  void startCollection(String repositoryUrl);
+  void startCollection(ActivityInstance activityInstance);
 }

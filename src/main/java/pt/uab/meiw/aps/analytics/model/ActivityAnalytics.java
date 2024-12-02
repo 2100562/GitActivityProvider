@@ -2,11 +2,14 @@ package pt.uab.meiw.aps.analytics.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.UUID;
+import org.bson.Document;
 
 /**
  * The Activity Analytics per-Student Model.
@@ -14,7 +17,10 @@ import java.util.StringJoiner;
  * @author Hugo Gonçalves
  * @since 0.0.1
  */
-public final class ActivityAnalytics {
+public final class ActivityAnalytics implements AsDocument {
+
+  @JsonIgnore
+  private String id;
 
   private String inveniraStdID;
 
@@ -27,7 +33,20 @@ public final class ActivityAnalytics {
   @JsonIgnore
   private String externalActivityId;
 
+  @JsonIgnore
+  private Instant updatedAt;
+
   public ActivityAnalytics() {
+    id = UUID.randomUUID().toString();
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+    updatedAt = Instant.now();
   }
 
   public String getInveniraStdID() {
@@ -36,6 +55,7 @@ public final class ActivityAnalytics {
 
   public void setInveniraStdID(String inveniraStdID) {
     this.inveniraStdID = inveniraStdID;
+    updatedAt = Instant.now();
   }
 
   public List<MetricWithValue<?>> getQualitativeAnalytics() {
@@ -45,6 +65,7 @@ public final class ActivityAnalytics {
   public void setQualitativeAnalytics(
       List<MetricWithValue<?>> qualitativeAnalytics) {
     this.qualitativeAnalytics = new LinkedList<>(qualitativeAnalytics);
+    updatedAt = Instant.now();
   }
 
   public List<MetricWithValue<?>> getQuantitativeAnalytics() {
@@ -54,6 +75,7 @@ public final class ActivityAnalytics {
   public void setQuantitativeAnalytics(
       List<MetricWithValue<?>> quantitativeAnalytics) {
     this.quantitativeAnalytics = new LinkedList<>(quantitativeAnalytics);
+    updatedAt = Instant.now();
   }
 
   public String getExternalActivityId() {
@@ -62,6 +84,21 @@ public final class ActivityAnalytics {
 
   public void setExternalActivityId(String externalActivityId) {
     this.externalActivityId = externalActivityId;
+    updatedAt = Instant.now();
+  }
+
+  @JsonIgnore
+  @Override
+  public Document getDocument() {
+    return new Document("inveniraStdID", inveniraStdID)
+        .append("qualAnalytics",
+            qualitativeAnalytics.stream().map(MetricWithValue::getDocument)
+                .toList())
+        .append("quantAnalytics",
+            quantitativeAnalytics.stream().map(MetricWithValue::getDocument)
+                .toList())
+        .append("externalActivityId", externalActivityId)
+        .append("updatedAt", updatedAt);
   }
 
   @Override
@@ -82,6 +119,7 @@ public final class ActivityAnalytics {
     return Objects.hash(inveniraStdID, qualitativeAnalytics,
         quantitativeAnalytics, externalActivityId);
   }
+
 
   @Override
   public String toString() {

@@ -75,9 +75,11 @@ public final class ActivityServiceImpl implements ActivityService {
       throw new RuntimeException("Failed to update activity instance");
     }
 
-    analyticsService.startCollection(repositoryUrl);
+    var activity = getActivity(id);
 
-    return getActivity(id);
+    analyticsService.startCollection(activity);
+
+    return activity;
   }
 
   @Override
@@ -85,7 +87,7 @@ public final class ActivityServiceImpl implements ActivityService {
     return dbClient
         .execute()
         .createNamedGet("get-activity")
-        .namedParam(id)
+        .addParam("id", id)
         .execute()
         .map(r -> r.as(ActivityInstance.class))
         .orElse(null);
