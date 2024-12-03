@@ -3,6 +3,8 @@ package pt.uab.meiw.aps.activity.impl;
 import io.helidon.config.Config;
 import io.helidon.dbclient.DbClient;
 import java.nio.charset.StandardCharsets;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pt.uab.meiw.aps.Utils;
 import pt.uab.meiw.aps.activity.ActivityService;
 import pt.uab.meiw.aps.activity.DeployRequest;
@@ -17,6 +19,9 @@ import pt.uab.meiw.aps.analytics.AnalyticsService;
  * @since 0.0.1
  */
 public final class ActivityServiceImpl implements ActivityService {
+
+  private static final Logger LOG = LogManager.getLogger(
+      ActivityServiceImpl.class);
 
   private final DbClient dbClient;
   private final String activityInterface;
@@ -46,6 +51,7 @@ public final class ActivityServiceImpl implements ActivityService {
         .createNamedQuery("get-activities-with-collection")
         .execute()
         .map(row -> row.as(ActivityInstance.class))
+        .peek(ai -> LOG.info("Resuming collection for activity {}", ai.getId()))
         .forEach(analyticsService::startCollection);
   }
 

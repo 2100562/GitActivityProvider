@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pt.uab.meiw.aps.Serdes;
 import pt.uab.meiw.aps.git.strategies.GitRepositoryStrategy;
 import pt.uab.meiw.aps.git.strategies.model.github.Commit;
@@ -28,6 +30,9 @@ import pt.uab.meiw.aps.git.strategies.model.github.Tree;
  * @since 0.0.1
  */
 public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
+
+  private static final Logger LOG = LogManager.getLogger(
+      GitHubRepositoryStrategy.class);
 
   private final ObjectMapper mapper = Serdes.INSTANCE.getObjectMapper();
   private final Pattern urlPattern = Pattern.compile(
@@ -96,6 +101,7 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
           .request(String.class);
 
       if (!resp.status().equals(Status.OK_200)) {
+        LOG.warn("getCommits(): GitHub API Response status: {}", resp.status());
         return List.of();
       }
 
@@ -103,6 +109,7 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
       };
       return mapper.readValue(resp.entity(), type);
     } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
       throw new IOException(e.getMessage(), e);
     }
   }
@@ -125,7 +132,11 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
       if (resp.status().equals(Status.OK_200)) {
         return true;
       }
+
+      LOG.warn("canFetchMetrics(): GitHub API Response status: {}",
+          resp.status());
     } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
       throw new IOException(e.getMessage(), e);
     }
 
@@ -143,11 +154,14 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
           .request(String.class);
 
       if (!resp.status().equals(Status.OK_200)) {
+        LOG.warn("getRepositoryCreationDate(): GitHub API Response status: {}",
+            resp.status());
         return Optional.empty();
       }
 
       response = mapper.readValue(resp.entity(), GetRepository.class);
     } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
       throw new IOException(e.getMessage(), e);
     }
 
@@ -178,11 +192,14 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
           .queryParam("recursive", "1").request(String.class);
 
       if (!resp.status().equals(Status.OK_200)) {
+        LOG.warn("getRepositoryFileNames(): GitHub API Response status: {}",
+            resp.status());
         return Set.of();
       }
 
       response = mapper.readValue(resp.entity(), GetTree.class);
     } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
       throw new IOException(e.getMessage(), e);
     }
 
