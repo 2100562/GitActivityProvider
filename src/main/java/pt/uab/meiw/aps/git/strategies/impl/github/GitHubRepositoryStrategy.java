@@ -7,6 +7,7 @@ import io.helidon.webclient.api.WebClient;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,8 +35,8 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
   private static final Logger LOG = LogManager.getLogger(
       GitHubRepositoryStrategy.class);
 
-  private final ObjectMapper mapper = Serdes.INSTANCE.getObjectMapper();
-  private final Pattern urlPattern = Pattern.compile(
+  private static final ObjectMapper mapper = Serdes.INSTANCE.getObjectMapper();
+  private static final Pattern urlPattern = Pattern.compile(
       "^https://(www\\.)?github\\.com/\\w+/\\w+$");
 
   private final WebClient client;
@@ -94,24 +95,51 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
         .append(details.name).append("/commits").toString();
   }
 
-  private List<Commit> getCommits(String repositoryUrl) throws IOException {
-    final var repoDetails = detailsFromUrl(repositoryUrl);
+  private void _getCommits(List<Commit> commits, String path, int page)
+      throws IOException {
     try {
-      final var resp = client.get().path(commitsApiUrl(repoDetails))
+      final var resp = client
+          .get()
+          //.queryParam("per_page", "100")
+          .path(path)
+          .queryParam("page", String.valueOf(page))
           .request(String.class);
 
       if (!resp.status().equals(Status.OK_200)) {
         LOG.warn("getCommits(): GitHub API Response status: {}", resp.status());
-        return List.of();
       }
 
       final var type = new TypeReference<List<Commit>>() {
       };
-      return mapper.readValue(resp.entity(), type);
+      commits.addAll(mapper.readValue(resp.entity(), type));
+
+      final var linkHeaderO = resp
+          .headers()
+          .stream()
+          .filter(h -> "LINK".equalsIgnoreCase(h.name()))
+          .findFirst();
+
+      if (linkHeaderO.isPresent()) {
+        final var links = linkHeaderO.get().values().split(",");
+
+        for (var link : links) {
+          final var name = link.split(";")[1];
+          if (" rel=\"next\"".equals(name)) {
+            _getCommits(commits, path, ++page);
+          }
+        }
+      }
+
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
       throw new IOException(e.getMessage(), e);
     }
+  }
+
+  private void getCommits(List<Commit> commits, String repositoryUrl)
+      throws IOException {
+    final var repoDetails = detailsFromUrl(repositoryUrl);
+    _getCommits(commits, commitsApiUrl(repoDetails), 1);
   }
 
   @SuppressWarnings("unchecked")
@@ -210,13 +238,17 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
   @Override
   public long getRepositoryCommitCount(String repositoryUrl)
       throws IOException {
-    return getCommits(repositoryUrl).size();
+    final var commits = new LinkedList<Commit>();
+    getCommits(commits, repositoryUrl);
+    return commits.size();
   }
 
   @Override
   public long getRepositoryAvgDurationBetweenCommits(String repositoryUrl)
       throws IOException {
-    final var commitDates = getCommits(repositoryUrl).stream()
+    final var commits = new LinkedList<Commit>();
+    getCommits(commits, repositoryUrl);
+    final var commitDates = commits.stream()
         .map(this::getCommitDate).sorted().toList();
 
     var ms = 0L;
