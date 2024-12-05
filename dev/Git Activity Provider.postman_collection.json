@@ -79,19 +79,30 @@
 		},
 		{
 			"name": "Get Analytics",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activityID\": \"Inven!RA_act1231\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "{{protocol}}://{{hostname}}:{{port}}/analytics/",
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/analytics",
 					"protocol": "{{protocol}}",
 					"host": [
 						"{{hostname}}"
 					],
 					"port": "{{port}}",
 					"path": [
-						"analytics",
-						""
+						"analytics"
 					]
 				}
 			},
@@ -99,12 +110,15 @@
 		},
 		{
 			"name": "Deploy Activity",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
-				"method": "POST",
+				"method": "GET",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"activityID\": \"This text is an activity instance identifier in Inven!RA\",\n    \"Inven!RAstdID\": \"This text is a user identifier in Inven!RA\",\n    \"json_params\": {\n        \"s1\" : \"Configuration Parameter 1\",\n        \"s2\" : \"Configuration Parameter 2\",\n        \"s3\" : \"Configuration Parameter 3\"\n    }\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -112,7 +126,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{protocol}}://{{hostname}}:{{port}}/activity/deploy",
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/activity/deploy/act1234",
 					"protocol": "{{protocol}}",
 					"host": [
 						"{{hostname}}"
@@ -120,45 +134,21 @@
 					"port": "{{port}}",
 					"path": [
 						"activity",
-						"deploy"
+						"deploy",
+						"act1234"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Get Activity",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{protocol}}://{{hostname}}:{{port}}/activity?id=1234",
-					"protocol": "{{protocol}}",
-					"host": [
-						"{{hostname}}"
-					],
-					"port": "{{port}}",
-					"path": [
-						"activity"
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "1234"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Individual Activity Config",
+			"name": "Provide Activity",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"studentId\": \"123\",\n    \"activityId\": \"1234\",\n    \"gitRepositoryUrl\": \"https://github.com/2100562/GitActivityProvider\"\n}",
+					"raw": "{\n    \"activityID\": \"Inven!RA_act12345\",\n    \"Inven!RAstdID\": \"Inven!RA_std32131\",\n    \"json_params\": {\n        \"name\" : \"Test Activity 2\",\n        \"instructions\" : \"Create a Test Repo\"\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -166,14 +156,16 @@
 					}
 				},
 				"url": {
-					"raw": "{{protocol}}://{{hostname}}:{{port}}/activity",
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/activity/deploy/act1234",
 					"protocol": "{{protocol}}",
 					"host": [
 						"{{hostname}}"
 					],
 					"port": "{{port}}",
 					"path": [
-						"activity"
+						"activity",
+						"deploy",
+						"act1234"
 					]
 				}
 			},
