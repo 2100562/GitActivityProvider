@@ -107,6 +107,7 @@ public final class GitHubRepositoryStrategy implements GitRepositoryStrategy {
 
       if (!resp.status().equals(Status.OK_200)) {
         LOG.warn("getCommits(): GitHub API Response status: {}", resp.status());
+        return;
       }
 
       final var type = new TypeReference<List<Commit>>() {
