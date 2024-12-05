@@ -1,6 +1,7 @@
 package pt.uab.meiw.aps.activity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.helidon.http.Method;
 import io.helidon.webserver.http.Handler;
 import io.helidon.webserver.http.HttpRules;
 import io.helidon.webserver.http.ServerRequest;
@@ -49,7 +50,8 @@ public final class ActivityController implements Controller {
         activityService);
 
     httpRules
-        .post("/deploy", activityDeploy)
+        .get("/deploy/{id}", activityDeploy)
+        .post("/deploy/{id}", activityDeploy)
         .get("/", activityProvideGet)
         .post("/", activityProvidePost);
   }
@@ -71,8 +73,23 @@ public final class ActivityController implements Controller {
 
     @Override
     public void handle(ServerRequest req, ServerResponse res) throws Exception {
-      DeployRequest request = null;
-      int status;
+      if (req.prologue().method().equals(Method.GET)) {
+        handleGet(req, res);
+      } else {
+        handlePost(req, res);
+      }
+    }
+
+    public void handleGet(ServerRequest req, ServerResponse res) {
+      final var deployUrl = req.requestedUri().toUri();
+
+      res.status(200).header("Content-Type", Constants.CONTENT_TYPE_JSON)
+          .send(Collections.singletonMap("deployURL", deployUrl));
+    }
+
+    public void handlePost(ServerRequest req, ServerResponse res)
+        throws Exception {
+      DeployRequest request;
 
       try {
         request = req.content().as(DeployRequest.class);
@@ -83,26 +100,16 @@ public final class ActivityController implements Controller {
       }
 
       final var activity = activityService.createFor(request);
-      final var activityEncoded = new String(
-          Base64.getEncoder()
-              .encode(mapper.writeValueAsString(activity).getBytes(
-                  StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+      final var activityEncoded = new String(Base64.getEncoder().encode(
+          mapper.writeValueAsString(activity).getBytes(StandardCharsets.UTF_8)),
+          StandardCharsets.UTF_8);
 
       // Find redirect URL
       final var orig = req.requestedUri().toUri();
-      final var query =
-          "id=" + activity.getId() +
-              "&data=" + activityEncoded;
+      final var query = "id=" + activity.getId() + "&data=" + activityEncoded;
 
-      final var url = new URI(
-          orig.getScheme(),
-          orig.getAuthority(),
-          "/activity",
-          query,
-          null
-      )
-          .toURL()
-          .toString();
+      final var url = new URI(orig.getScheme(), orig.getAuthority(),
+          "/activity", query, null).toURL().toString();
 
       res
           .status(200)
@@ -130,14 +137,10 @@ public final class ActivityController implements Controller {
     @Override
     public void handle(ServerRequest req, ServerResponse res) throws Exception {
       if (!req.query().contains("id") || !req.query().contains("data")) {
-        res
-            .status(400)
-            .header("Content-Type", Constants.CONTENT_TYPE_HTML)
+        res.status(400).header("Content-Type", Constants.CONTENT_TYPE_HTML)
             .send("Missing Activity details");
       } else {
-        res
-            .status(200)
-            .header("Content-Type", Constants.CONTENT_TYPE_HTML)
+        res.status(200).header("Content-Type", Constants.CONTENT_TYPE_HTML)
             .send(activityService.getActivityInterface());
       }
     }
@@ -168,14 +171,13 @@ public final class ActivityController implements Controller {
         request = req.content().as(ProvideRequest.class);
         status = 200;
         LOG.info("ProvideRequest deploy request: {}", request);
-        activityService.setRepository(request.getActivityId(), request.getGitRepositoryUrl());
+        activityService.setRepository(request.getActivityId(),
+            request.getGitRepositoryUrl());
       } catch (RuntimeException e) {
         status = 400;
       }
 
-      res
-          .status(status)
-          .header("Content-Type", Constants.CONTENT_TYPE_JSON)
+      res.status(status).header("Content-Type", Constants.CONTENT_TYPE_JSON)
           .send();
     }
   }
