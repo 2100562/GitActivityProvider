@@ -1,10 +1,10 @@
 [
   {
-    "name": "name",
+    "name": "activity_name",
     "type": "text/plain"
   },
   {
-    "name": "instructions",
+    "name": "activity_instructions",
     "type": "text/plain"
   }
 ]
