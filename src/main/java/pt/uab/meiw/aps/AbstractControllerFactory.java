@@ -5,7 +5,6 @@ import pt.uab.meiw.aps.activity.ActivityServiceFactory;
 import pt.uab.meiw.aps.analytics.AnalyticsControllerFactory;
 import pt.uab.meiw.aps.analytics.AnalyticsServiceFactory;
 import pt.uab.meiw.aps.configuration.ConfigurationControllerFactory;
-import pt.uab.meiw.aps.configuration.ConfigurationServiceFactory;
 import pt.uab.meiw.aps.git.GitServiceFactory;
 
 /**
@@ -16,14 +15,12 @@ import pt.uab.meiw.aps.git.GitServiceFactory;
  */
 public final class AbstractControllerFactory {
 
-  private static final ServiceFactory CONFIG_SV_FACTORY = new ConfigurationServiceFactory();
   private static final GitServiceFactory GIT_SV_FACTORY = new GitServiceFactory();
   private static final ServiceFactory ANALYTICS_SV_FACTORY = new AnalyticsServiceFactory(
       GIT_SV_FACTORY);
   private static final ServiceFactory ACTIVITY_SV_FACTORY = new ActivityServiceFactory(
       ANALYTICS_SV_FACTORY);
-  private static final ControllerFactory CONFIG_CTRL_FACTORY = new ConfigurationControllerFactory(
-      CONFIG_SV_FACTORY);
+  private static final ControllerFactory CONFIG_CTRL_FACTORY = new ConfigurationControllerFactory();
   private static final ControllerFactory ANALYTICS_CTRL_FACTORY = new AnalyticsControllerFactory(
       ANALYTICS_SV_FACTORY);
   private static final ControllerFactory ACTIVITY_CTRL_FACTORY = new ActivityControllerFactory(

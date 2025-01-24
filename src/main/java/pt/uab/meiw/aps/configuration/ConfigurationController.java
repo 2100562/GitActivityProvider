@@ -1,11 +1,19 @@
 package pt.uab.meiw.aps.configuration;
 
-import io.helidon.webserver.http.Handler;
+import com.fasterxml.jackson.core.type.TypeReference;
+import io.helidon.config.Config;
 import io.helidon.webserver.http.HttpRules;
-import io.helidon.webserver.http.ServerRequest;
-import io.helidon.webserver.http.ServerResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import pt.uab.meiw.aps.Constants;
 import pt.uab.meiw.aps.Controller;
+import pt.uab.meiw.aps.DeserializationException;
+import pt.uab.meiw.aps.Serdes;
+import pt.uab.meiw.aps.Utils;
 
 /**
  * The Configuration Controller is responsible for configuring the Helidon
@@ -17,10 +25,48 @@ import pt.uab.meiw.aps.Controller;
  */
 public final class ConfigurationController implements Controller {
 
-  private final ConfigurationService configurationService;
+  private static final String DESER_ERR = "Exception while deserializing configuration parameters";
 
-  public ConfigurationController(ConfigurationService configurationService) {
-    this.configurationService = configurationService;
+  private final List<Map<String, Object>> configurationParameters;
+  private final String configurationInterface;
+
+  public ConfigurationController() {
+    final var om = Serdes.INSTANCE.getObjectMapper();
+    final var config = Config.global();
+
+    final var configParPath = config
+        .get("ap")
+        .get("configuration")
+        .get("parameters-path")
+        .asString()
+        .orElse("");
+
+    final var configHtmlPath = config
+        .get("ap")
+        .get("configuration")
+        .get("interface-path")
+        .asString()
+        .orElse("");
+
+    final var configParFile = Utils.readFile(configParPath);
+    final var configHtmlFile = Utils.readFile(configHtmlPath);
+
+    if (configParFile.isEmpty()) {
+      configurationParameters = new LinkedList<>();
+    } else {
+      final var type = new TypeReference<List<Map<String, Object>>>() {
+      };
+
+      try {
+        configurationParameters = om.readValue(configParFile.get(), type);
+      } catch (IOException e) {
+        throw new DeserializationException(DESER_ERR, e);
+      }
+    }
+
+    configurationInterface = configHtmlFile
+        .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
+        .orElse("");
   }
 
   /**
@@ -30,64 +76,18 @@ public final class ConfigurationController implements Controller {
    */
   @Override
   public void routing(HttpRules httpRules) {
-    final var configParametersHandler = new ConfigurationParametersHandler(
-        configurationService);
-
-    final var configInterfaceHandler = new ConfigurationInterfaceHandler(
-        configurationService);
-
     httpRules
-        .get("/parameters", configParametersHandler)
-        .get("/interface", configInterfaceHandler);
-  }
-
-  /**
-   * The Configuration Parameters Handler which handles requests to
-   * /configuration/parameters.
-   *
-   * @author Hugo Gonçalves
-   * @since 0.0.1
-   */
-  private static final class ConfigurationParametersHandler implements Handler {
-
-    private final ConfigurationService configurationService;
-
-    private ConfigurationParametersHandler(
-        ConfigurationService configurationService) {
-      this.configurationService = configurationService;
-    }
-
-    @Override
-    public void handle(ServerRequest req, ServerResponse res) throws Exception {
-      res
-          .status(200)
-          .header("Content-Type", Constants.CONTENT_TYPE_JSON)
-          .send(configurationService.getConfigurationParameters());
-    }
-  }
-
-  /**
-   * The Configuration Interface Handler which handles requests to
-   * /configuration/interface.
-   *
-   * @author Hugo Gonçalves
-   * @since 0.0.1
-   */
-  private static final class ConfigurationInterfaceHandler implements Handler {
-
-    private final ConfigurationService configurationService;
-
-    private ConfigurationInterfaceHandler(
-        ConfigurationService configurationService) {
-      this.configurationService = configurationService;
-    }
-
-    @Override
-    public void handle(ServerRequest req, ServerResponse res) throws Exception {
-      res
-          .status(200)
-          .header("Content-Type", Constants.CONTENT_TYPE_HTML)
-          .send(configurationService.getConfigurationInterface());
-    }
+        .get("/parameters", (req, res) -> {
+          res
+              .status(200)
+              .header("Content-Type", Constants.CONTENT_TYPE_JSON)
+              .send(Collections.unmodifiableList(configurationParameters));
+        })
+        .get("/interface", (req, res) -> {
+          res
+              .status(200)
+              .header("Content-Type", Constants.CONTENT_TYPE_JSON)
+              .send(configurationInterface);
+        });
   }
 }

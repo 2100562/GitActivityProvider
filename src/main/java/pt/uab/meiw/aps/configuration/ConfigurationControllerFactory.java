@@ -2,7 +2,6 @@ package pt.uab.meiw.aps.configuration;
 
 import pt.uab.meiw.aps.Controller;
 import pt.uab.meiw.aps.ControllerFactory;
-import pt.uab.meiw.aps.ServiceFactory;
 
 /**
  * The Configuration Controller Factory.
@@ -14,9 +13,8 @@ public final class ConfigurationControllerFactory implements ControllerFactory {
 
   private final Controller instance;
 
-  public ConfigurationControllerFactory(ServiceFactory serviceFactory) {
-    instance = new ConfigurationController(
-        (ConfigurationService) serviceFactory.create());
+  public ConfigurationControllerFactory() {
+    instance = new ConfigurationController();
   }
 
   @Override
