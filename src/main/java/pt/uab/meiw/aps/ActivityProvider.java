@@ -4,6 +4,7 @@ import io.helidon.config.Config;
 import io.helidon.http.media.jackson.JacksonSupport;
 import io.helidon.webserver.WebServer;
 import io.helidon.webserver.accesslog.AccessLogFeature;
+import io.helidon.webserver.cors.CorsSupport;
 import io.helidon.webserver.http.HttpRouting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,11 @@ public final class ActivityProvider {
         .routing(
             HttpRouting
                 .builder()
+                .register(CorsSupport.builder()
+                    .allowOrigins("*")
+                    .allowMethods("*")
+                    .allowHeaders("*")
+                    .build())
                 .register("/configuration",
                     factory.createController(ControllerType.Configuration))
                 .register("/analytics",
