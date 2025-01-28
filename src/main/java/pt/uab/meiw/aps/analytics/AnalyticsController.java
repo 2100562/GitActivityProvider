@@ -36,7 +36,7 @@ public final class AnalyticsController implements Controller {
     final var analyticsHandler = new AnalyticsHandler(analyticsService);
 
     httpRules
-        .get("/", analyticsHandler)
+        .post("/", analyticsHandler)
         .get("/contract", analyticsContractHandler);
   }
 
