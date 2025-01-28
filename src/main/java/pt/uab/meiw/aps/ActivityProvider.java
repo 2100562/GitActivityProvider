@@ -1,6 +1,7 @@
 package pt.uab.meiw.aps;
 
 import io.helidon.config.Config;
+import io.helidon.cors.CrossOriginConfig;
 import io.helidon.http.media.jackson.JacksonSupport;
 import io.helidon.webserver.WebServer;
 import io.helidon.webserver.accesslog.AccessLogFeature;
@@ -32,6 +33,16 @@ public final class ActivityProvider {
 
     LOG.info("Building and starting WebServer");
 
+    final var cors = CorsSupport.builder()
+        .addCrossOrigin(CrossOriginConfig.builder()
+            .allowOrigins("*")
+            .allowMethods("*")
+            .allowHeaders("*")
+            .build())
+        .allowCredentials(true)
+        .enabled(true)
+        .build();
+
     // Build the HTTP routes and start WebServer
     WebServer
         .builder()
@@ -47,16 +58,11 @@ public final class ActivityProvider {
         .routing(
             HttpRouting
                 .builder()
-                .register(CorsSupport.builder()
-                    .allowOrigins("*")
-                    .allowMethods("*")
-                    .allowHeaders("*")
-                    .build())
-                .register("/configuration",
+                .register("/configuration", cors,
                     factory.createController(ControllerType.Configuration))
-                .register("/analytics",
+                .register("/analytics", cors,
                     factory.createController(ControllerType.Analytics))
-                .register("/activity",
+                .register("/activity", cors,
                     factory.createController(ControllerType.Activity))
         )
         .config(config.get("server"))
