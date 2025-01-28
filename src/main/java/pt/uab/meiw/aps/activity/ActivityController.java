@@ -1,6 +1,7 @@
 package pt.uab.meiw.aps.activity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.helidon.http.HeaderNames;
 import io.helidon.http.Method;
 import io.helidon.webserver.http.Handler;
 import io.helidon.webserver.http.HttpRules;
@@ -81,10 +82,19 @@ public final class ActivityController implements Controller {
     }
 
     public void handleGet(ServerRequest req, ServerResponse res) {
-      final var deployUrl = req.requestedUri().toUri();
+      final var deployUrl = getClientUrl(req);
 
       res.status(200).header("Content-Type", Constants.CONTENT_TYPE_JSON)
           .send(Collections.singletonMap("deployURL", deployUrl));
+    }
+
+    public String getClientUrl(ServerRequest req) {
+      String forwardedProto = req.headers().value(HeaderNames.X_FORWARDED_PROTO)
+          .orElse("http");
+      String host = req.headers().value(HeaderNames.HOST).orElse("localhost");
+      String path = req.requestedUri().path().toString();
+
+      return forwardedProto + "://" + host + path;
     }
 
     public void handlePost(ServerRequest req, ServerResponse res)
