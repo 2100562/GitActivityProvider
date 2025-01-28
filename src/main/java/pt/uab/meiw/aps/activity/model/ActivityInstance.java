@@ -27,8 +27,8 @@ public final class ActivityInstance {
 
   public ActivityInstance(DeployRequest deployRequest) {
     id = UUID.randomUUID().toString();
-    activityName = deployRequest.getParams().get("name");
-    activityInstructions = deployRequest.getParams().get("instructions");
+    activityName = deployRequest.getParams().get("activity_name");
+    activityInstructions = deployRequest.getParams().get("activity_name");
     externalActivityId = deployRequest.getActivityId();
     externalStudentId = deployRequest.getStudentId();
   }

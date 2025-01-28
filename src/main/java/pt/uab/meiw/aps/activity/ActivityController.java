@@ -180,10 +180,11 @@ public final class ActivityController implements Controller {
       try {
         request = req.content().as(ProvideRequest.class);
         status = 200;
-        LOG.info("ProvideRequest deploy request: {}", request);
+        LOG.info("ProvideRequest: {}", request);
         activityService.setRepository(request.getActivityId(),
             request.getGitRepositoryUrl());
       } catch (RuntimeException e) {
+        LOG.info("ProvideRequest failed", e);
         status = 400;
       }
 
