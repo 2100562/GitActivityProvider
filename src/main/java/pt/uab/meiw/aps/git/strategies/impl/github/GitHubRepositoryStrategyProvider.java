@@ -34,15 +34,16 @@ public final class GitHubRepositoryStrategyProvider implements
         .get("strategies")
         .get("github")
         .get("token")
-        .asString()
-        .get();
+        .asString();
 
     final var clientBuilder = WebClient
         .builder()
         .baseUri(baseUri)
         .config(config.get("ap.git.strategies.github.client"));
 
-    clientBuilder.defaultHeadersMap().put("Authorization", token);
+    if (token.isPresent()) {
+      clientBuilder.defaultHeadersMap().put("Authorization", token.get());
+    }
 
     return new GitHubRepositoryStrategy(clientBuilder.build());
   }
